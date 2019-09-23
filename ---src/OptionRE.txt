@@ -1,6 +1,0 @@
-:	C:/Users/BIN/Nox_share/AppShare/
-:	/mnt/shared/App/screencap.png
-TranThang2end: 15
-TimeWar:	70
-Shutdown:	1
-CloseNox:	1
