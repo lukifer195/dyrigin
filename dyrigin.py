@@ -5,8 +5,8 @@ import time
 import traceback
 import subprocess
 from subprocess import PIPE, Popen, call
-import win_unicode_console
-win_unicode_console.enable()
+import logging
+# import win_unicode_console
 
 # libs bảo mật
 # from shutil import copyfile
@@ -22,11 +22,12 @@ from Imagesearch import imagesearch  # import class Imagesearch
 # from cryptolize import decrypt_input, decryptize_LICENSE_to_test, hashfile, real_license
 
 
-## Input console
-# cTranThang2end  = int(input('Số trận mặc định 15            :   '))
-# cTimeWar        = int(input('Thời gian tối đa 1 trận(45s)   :   '))
-# isShutdown      = int(input('1 là Shutdown khi hoàn tất     , 0 là bỏ qua và là mặc định:  '))
-# isCloseNox      = int(input('1 là tắt Nox khi xong hoặc lỗi , 0 là bỏ qua và là mặc định:  '))
+
+# # Input console
+# cTranThang2end  = int(input('Default count win (15)                         :'))
+# cTimeWar        = int(input('Time maximum in a war (45s)                    :'))
+# isShutdown      = int(input('Shutdown when reach Default count win          :'))
+# isCloseNox      = int(input('Close Nox when reach Default count win or error:'))
 # if cTranThang2end =="":
 #     cTranThang2end = 4
 # if cTimeWar     ==  "":
@@ -38,9 +39,9 @@ from Imagesearch import imagesearch  # import class Imagesearch
 
 # Set cứng
 isLiettruyen = 0
-cTranThang2end = 40
+cTranThang2end = 15
 cTimeWar    = 45
-isShutdown  = 0
+isShutdown  = 1
 isCloseNox  = 1
 
 # Initing Value
@@ -52,59 +53,56 @@ posAUTO = (0, 0)
 path = os.path.dirname(sys.argv[0])
 path_Scr = os.path.abspath('scr')
 # path = 'E:/PyProject/Pydctq/'  # set cứng
-# path_Scr = 'E:\\Desktop\\PyProject\\Pydctq/scr/'  # set cứng
+# path_Scr = 'D:\\Desktop\\PyProject\\Pydctq/scr/'  # set cứng
 # get_Paths()
-
-print('<> Path Source:  ', path_Scr)
-print('<> Count Win:          ', cTranThang2end)
-print('<> Time out:           ', cTimeWar)
-print('<> Shutdown when ended:', bool(isShutdown))
-print('<> Close Nox when fail:', bool(isCloseNox))
+# win_unicode_console.enable()
+logging.info('<> Path Source:        ', path_Scr)
+logging.info('<> Count Win:          ', cTranThang2end)
+logging.info('<> Time out:           ', cTimeWar)
+logging.info('<> Shutdown when ended:', bool(isShutdown))
+logging.info('<> Close Nox when fail:', bool(isCloseNox))
 
 #=========================================Logic Auto==============================================#
 
 def connect():
     """connect :62001"""
-    print(' ______________Connecting_____________')
+    logging.info(' ______________Connecting_____________')
     Pconnect = Popen('adb connect 127.0.0.1:62001', shell=True, stdout=PIPE)
     Popen('adb root ', shell=True)
     stderrConn = Pconnect.communicate()
-    # print(stderrConn)
+    # logging.info(stderrConn)
     try:
-        for _ in range(1):
+        for _ in range(3):
             if stderrConn[0] == b'already connected to 127.0.0.1:62001\r\n':
-                print('__Connected__')
+                logging.info('______________Connected_______________')
                 checkauto()
                 if isLiettruyen == 1:
                     lietruyen()
                 else:
                     dbomLinh()
                     BoquaXacthuc()
-            else:
-                print(stderrConn[1])
-                time.sleep(1)
-        else:
-            raise Exception('Can connect try again')
-    except IOError:
+            # else:
+                # time.sleep(2)
+                # call(r'adb start-server')
+                # time.sleep(3)
+                # call(r'adb start-server')
+                # time.sleep(3)
+                # connect()
+    
+    except cv2.error:
         global cCountError
         if cCountError < 3:
-            print(e)
-            cCountError = cCountError + 1 
-            print(cCountError)
+            logging.info(' image not found')
+            cCountError += cCountError 
+            logging.info(cCountError)
             get_Paths()
             connect()
-
     except Exception as e:
-        print(e)
-        def_trackback()
-
+        logging.error('Lỗi kết nối: ', exec_info = True)
+        
     finally:
-        def_trackback()
         time.sleep(3)
         exit_auto()
-
-
-
 
 
 def checkauto():
@@ -114,9 +112,9 @@ def checkauto():
     if imgAuto.find(showpos=True):
         global posAUTO
         posAUTO = imgAuto.find(showpos=True)[0]
-        print('Auto in y.x: ', posAUTO)
+        logging.info('Auto in y.x: ', posAUTO)
     else:
-        print('openAuto')
+        logging.info('openAuto')
         openAuto()
 
 
@@ -129,10 +127,10 @@ def BoquaXacthuc():
     giaotranh()
 
 def lietruyen():
-    print('liệt truyện')
+    logging.info('isLiettruyen')
     if isLiettruyen == 1: 
         if click_image('chinhchien.png' , 0) == "notfound":
-            print('Hãy chọn liệt truyện và thử lại')
+            logging.info('Choise lietruyen and try again')
             exit_auto()
         time.sleep(0.5)
         call(['adb', 'shell', 'input', 'tap', '700', '600'])        # click xuất chiến
@@ -161,7 +159,7 @@ def giaotranh():
     """
     # printdb('def giaotranh')
     time.sleep(8)
-    # print('def giao tranh')
+    logging.info('def giao tranh')
     for x in range(6):
         screencap()
         # thấy next thì chuyển
@@ -184,12 +182,12 @@ def danh():
     """
     # printdb('def danh')
     imgmanh = imagesearch(path_Scr + '\\screencap.png',
-                          path_Scr + '\\temp.png', 0.7)
+                          path_Scr + '\\longden.png', 0.77)
     time.sleep(1)
     # mạnh bỏ qua
     if imgmanh.find() >= 1:
         click_next()
-        print('Chọn thằng khác')
+        logging.info('Next')
         giaotranh()
     else:
         click_danh()
@@ -228,12 +226,12 @@ def DanhTiep():
             break
         elif imgDanhTiep.find() >= 1:
             cTranThang += 1
-            print('==[] Xong thằng thứ ', cTranThang)
+            logging.info('==[] Win  ', cTranThang)
             if cTranThang >= cTranThang2end:
                 Exit_NOX()
                 exit_auto()
-            elif cTranThang in range(6, 56, 5):  # Mua lính   cách  5 thằng
-                print()
+            elif cTranThang in [3,8,11,16]:  # Mua lính   cách  5 thằng
+                logging.info('Count: ',cTranThang)
                 # nút hồi thành
                 call(['adb', 'shell', 'input', 'tap', '1100', '650'])
                 time.sleep(8)
@@ -243,7 +241,7 @@ def DanhTiep():
                 break
             else:  # đánh tiếp
                 # time.sleep(5)
-                print('đánh tiếp')
+                logging.info('Continue')
                 call(r'adb shell input tap 85 666')  # nút đánh tiếp
                 time.sleep(0.5)
                 call(['adb', 'shell', 'input', 'tap', '777', '450'])  # nút ok
@@ -251,17 +249,17 @@ def DanhTiep():
                 break
         else:
             time.sleep(2)
-            print('Chờ đánh xong', x)
+            logging.info('Wait ', x)
     else:
         cTranThang += 1
-        print('==[] Xong Thằng thứ :', cTranThang)
+        logging.info('==[] Win  :', cTranThang)
         click_rutlui()
         time.sleep(5)
         if cTranThang >= cTranThang2end:
             Exit_NOX()
             exit_auto()
         else:
-            print('đánh tiếp')
+            logging.info('Continue')
             call(r'adb shell input tap 85 666')  # nút đánh tiếp
             time.sleep(0.5)
             call(['adb', 'shell', 'input', 'tap', '777', '450'])  # nút ok
@@ -270,6 +268,7 @@ def DanhTiep():
 def CheckHoiThanh():
     """ for check quansu -> break else checkloivethanh 
     """
+    logging.info('check Hồi thành')
     for _ in range(10):
         screencap()
         quansu = imagesearch(path_Scr + '\\screencap.png',
@@ -278,7 +277,7 @@ def CheckHoiThanh():
             break
         else:
             time.sleep(2)
-            print('Đang Về Thành ')
+            logging.info('Wait to come home')
     else:
         check_loi_vethanh()
 
@@ -288,17 +287,18 @@ def CheckHoiThanh():
 #         screencap()
 #         imgshield = imagesearch(path_Scr+'\\screencap.png',path_Scr+'\\shield.png',0.88)
 #         if imgshield.find() >=1 :
-#             print('~~~~~Xong Thằng thứ :',cTranThang)
+#             logging.info('~~~~~Xong Thằng thứ :',cTranThang)
 #             click_rutlui()
 #             time.sleep(8)
 #             CheckHoiThanh()
 #             BoquaXacthuc()
 #         else:
 #             time.sleep(2)
-#             print('chờ ăn dc khiên',x)
+#             logging.info('chờ ăn dc khiên',x)
 
 
 def check_loi_vethanh():
+    logging.warning('Check lỗi về thành')
     """imgerror -> click trở về -> check hồi thành\n
         /-> imgquansu -> giao tranh\n
         /-> reset ccounterror -> wait10min
@@ -306,7 +306,7 @@ def check_loi_vethanh():
     global cCountError
     cCountError = cCountError + 1
     if cCountError >= 20:
-        print('(o>>>>>>Lỗi lằm lỗi lốn 30 lần r ,nghỉ <<<<<<o)')
+        logging.info('(o>>>>>> End by 20 count Error <<<<<<o)')
         Exit_NOX()
         exit_auto()
     else:  # check mất mạng
@@ -315,7 +315,7 @@ def check_loi_vethanh():
                             path_Scr + '\\error.png', 0.88)
         if error.find() == True:  # check lỗi mạng
             call(['adb', 'shell', 'input', 'tap', '632', '444'])
-            print('(o>>>>>>Lỗi mạng lần ', cCountError, "\t\t <<<<<<o)")
+            logging.warning('(o>>>>>> Count Error :  %s <<<<<<o)',cCountError)
             time.sleep(8)
             CheckHoiThanh()
             BoquaXacthuc()  # ***
@@ -327,7 +327,7 @@ def check_loi_vethanh():
                                  path_Scr + '\\quansu.png', 0.88)
             # giao tranh wait >=3 lần  ->  wait10min
             if quansu.find() >= 1:
-                print('(o>>>>>>Lỗi dính giao diện lần', cCountError, ' <<<<<<o)')
+                logging.info('(o>>>>>> Fail with something', cCountError, ' <<<<<<o)')
                 click_giaotranh()
                 ############################################## Giống bước giaotranh() ################
                 time.sleep(8)
@@ -342,11 +342,11 @@ def check_loi_vethanh():
                         break
                     else:
                         time.sleep(2)
-                        print('Wait')
+                        logging.info('Wait')
                 else:
                     global cWait10min
                     cCountError = 0
-                    print('***reset count Error')
+                    logging.info('***reset count Error')
                     if cWait10min <= 3:
                         cWait10min = cWait10min + 1
                         Wait_10min()                # chết tướng
@@ -358,7 +358,7 @@ def check_loi_vethanh():
 ###============================================ Tọa độ ==============================================###
 
 def click_giaotranh():
-    print('Giao tranh')
+    logging.info('go War')
     call(r'adb shell input tap 300 680')
     call(r'adb shell input tap 60 660')
     call(['adb', 'shell', 'input', 'tap', '170', '540'])
@@ -375,7 +375,7 @@ def click_next():
 
 
 def click_rutlui():
-    print('Lui chiến thuật')
+    logging.info('Come Home')
     call(['adb', 'shell', 'input', 'tap', '150', '500'])
     call(['adb', 'shell', 'input', 'tap', '800', '450'])
     # time.sleep(5)
@@ -383,7 +383,8 @@ def click_rutlui():
 
 
 def click_danh():
-    print('Auto đánh')
+    logging.info('Auto fight')
+    logging.debug('#posAUTO: ' ,  ' '.join(str(x) for x in posAUTO[::-1]))
     call('adb shell input tap ' + ' '.join(str(x) for x in posAUTO[::-1]))
     
 ###======================================== funtion =============================================###
@@ -394,20 +395,19 @@ def exit_auto():
     """
     # def_trackback()
     pid = os.getpid()
+    logging.debug('Pid auto :' , pid)
     call(r'taskkill /pid %s /f' % pid)
 
 
 def Exit_NOX():
     """Exit NOX by taskkill
     """
-    print('o>>> Close Nox after 10s <<<o')
-    for x in range(10):
-        print(10 - x)
-        time.sleep(1)
+    logging.info('o>>> Close Nox after 10s <<<o')
     if isShutdown == 1:
+        logging.info('Shutdown PC')
+        time.sleep(10)
         call(['shutdown', '/f', '/s', '/t', '100'])
-    def_trackback()
-    print('GoodBye')
+    logging.info('Kill all Nox ')
     call(['taskkill', '/f', '/im', 'Nox.exe'])
     call(['taskkill', '/f', '/im', 'NoxVMHandle.exe'])
     call(['taskkill', '/f', '/im', 'nox_adb.exe'])
@@ -415,21 +415,22 @@ def Exit_NOX():
 
 
 def Wait_10min():
-    print(time.ctime(), ': Chờ 10p sau sẽ chạy tiếp')
+    logging.info(time.ctime(), ': Pause 10min ')
     time.sleep(600)
     check_loi_vethanh()
 
 def def_trackback():
     """logging current time + trackback vào src/log.txt
     """
-    with open(path_Scr + '\\log.txt', 'a') as f:
+    with open(path_Scr + '\\log.txt', 'a' , encoding='utf8' ) as f:
         f.write('\n<<o>>' + str(time.ctime())
                 + '<<o>>\n'+ traceback.format_exc()
                 + '\n-->Error:' + str(cCountError) + '\tCount:' + str(cTranThang))
 
 def dbomLinh():
-    print('(*)-------Bơm TNS------(*)')
+    logging.info('(*)-------build TNS------(*)')
     click_image('//warhouse.png')
+    time.sleep(0.5)
     click_image('//huanluyen.png')
     call(['adb', 'shell', 'input', 'tap', '1260', '50'])
     call(['adb', 'shell', 'input', 'tap', '1260', '100'])
@@ -444,6 +445,7 @@ def get_Paths():
         nếu có thì ghi đè biến k thì dùng mặc định
     """
     list_of_lines = []
+    logging.info('Get paths in OptionRE.txt')
     with open(path_Scr + '\\OptionRE.txt') as f:
         for _ in range(10):
             line = f.readline().split('\n')
@@ -452,7 +454,7 @@ def get_Paths():
         i = 0
         for _ in list_of_lines:
             strline = ''.join(list_of_lines[i])
-            # print(strline)
+            # logging.info(strline)
             i = i + 1
             if re.search('cTranThang2end', strline):
                 kq = strline.replace('cTranThang2end: ', '')
@@ -479,6 +481,7 @@ def get_Paths():
 def screencap():
     """chụp ảnh nox qua cmd.pipe.stdout.read lưu vào Scr/screencap.png
     """
+    logging.debug('- Chụp màn hình nox')
     pipe = Popen("adb shell screencap -p", stdout=PIPE, shell=True)
     image_bytes = pipe.stdout.read().replace(b'\r\r\n', b'\n')
     with open(path_Scr + '//screencap.png', 'wb') as file:
@@ -492,19 +495,21 @@ def click_image(image,  notfound = 'check_loi_vethanh'):
     click_image('warhouse.png')         
     click_image('warhouse.png' , 0) if not found image do nothing
     """
+    logging.info('Tìm và click image : ',image)
     position = ()
     screencap()
     imgfind = imagesearch(path_Scr + '//screencap.png',
-                          path_Scr + '//' + image, 0.7 )
+                          path_Scr + '//' + image, 0.77 )
+    logging.debug('$position : ',position)
     try:
         position = imgfind.find(showpos=True)[0]
         if position != None:
             position_to_string = ' '.join(str(x) for x in position[::-1])
-            # print(position_to_string)
+            # logging.info(position_to_string)
             call('adb shell input tap ' + position_to_string)
             return "Ok"
     except (IndexError,Exception):
-        print('Image not found')
+        logging.error('Image not found' , exec_info = True)
         if notfound == 'check_loi_vethanh':
             check_loi_vethanh()
         elif notfound == 0:
@@ -530,7 +535,7 @@ def openAuto():
             posiconAutostr = ' '.join(str(x) for x in posiconAuto[::-1])
             posiconDCTQstr = ' '.join(str(x) for x in posiconDCTQ[::-1])
             call('adb shell input tap ' + posiconAutostr)
-            print('Đã tìm thấy auto tại x.y: ', posiconAutostr)
+            logging.info('$ position AUTO in x.y: ', posiconAutostr)
             time.sleep(2)
             call('adb shell input keyevent 3')
             time.sleep(1)
@@ -541,11 +546,20 @@ def openAuto():
         else:
             checkauto()
     else:
-        print('k tìm thấy auto')
-        raise Exception('K có auto')
+        logging.error('Auto icon notfound' , exec_info = True)
+        raise Exception('Auto icon notfound')
 
 
 if __name__ == '__main__':
-    connect()
     # screencap()
-    # dbomLinh()
+    import logging
+    logging.basicConfig(    filename = "E:/logging.log" , level=logging.DEBUG, filemode='w+', 
+                            format = (  '%(levelname)s:\t'
+                                        '%(filename)s:'
+                                        '%(funcName)s():'
+                                        '%(lineno)d\t'
+                                        '%(message)s'           ))
+
+    connect()
+
+    

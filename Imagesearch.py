@@ -27,28 +27,30 @@ class imagesearch():
         """
         # Popen('adb shell mount -o rw,remount /system',shell=True)
         # Popen('adb shell mount -o rw,remount /mnt/shared/App/',shell = True)
-        rgb = cv2.imread(self.pathscreencap)
-        grayimg = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
-        # viewgray = cv2.imshow('dddd',grayimg)
-        # cv2.waitKey(10000)
-        imagesearch = cv2.imread(self.imagesearch, 0)
+        try:
+            rgb = cv2.imread(self.pathscreencap)
+            grayimg = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
+            # viewgray = cv2.imshow('dddd',grayimg)
+            # cv2.waitKey(10000)
+            imagesearch = cv2.imread(self.imagesearch, 0)
 
-        res = cv2.matchTemplate(grayimg, imagesearch, cv2.TM_CCOEFF_NORMED)
-        threshhold = self.threshhold
-        loc = np.where(res >= threshhold)
-        countmatch = 0
-        if showpos == False:
-            for pt in zip(*loc):
-                pt != None
-                countmatch += 1
+            res = cv2.matchTemplate(grayimg, imagesearch, cv2.TM_CCOEFF_NORMED)
+            threshhold = self.threshhold
+            loc = np.where(res >= threshhold)
+            countmatch = 0
             if showpos == False:
-                return countmatch
-        if showpos == True:
-            listpt = []
-            for pt in zip(*loc):
-                listpt.append(pt)
-            return listpt
-
-# imp=  imagesearch(r'E:/PyProject/Pydctq/scr/nor.png',r'E:/PyProject/Pydctq/scr/temp.png'
+                for pt in zip(*loc):
+                    pt != None
+                    countmatch += 1
+                if showpos == False:
+                    return countmatch
+            elif showpos == True:
+                listpt = []
+                for pt in zip(*loc):
+                    listpt.append(pt)
+                return listpt
+        except cv2.error:
+            raise
+# imp=  imagesearch(r'E:/PyProjec/Pydctq/scr/nor.png',r'E:/PyProject/Pydctq/scr/temp.png'
 #                         ,threshhold = 0.5, showpos=True)
-# print(imp.find(True)[1])
+# print(imp.find(False))
