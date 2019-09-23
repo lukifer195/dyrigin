@@ -1,4 +1,4 @@
-import os , testttt 
+import os
 import re
 import sys
 import time
@@ -6,7 +6,6 @@ import traceback
 import subprocess
 from subprocess import PIPE, Popen, call
 import logging
-# import win_unicode_console
 
 # libs bảo mật
 # from shutil import copyfile
