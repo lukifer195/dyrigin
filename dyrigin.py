@@ -1,4 +1,4 @@
-import os
+import os , testttt 
 import re
 import sys
 import time
@@ -99,6 +99,7 @@ def connect():
             connect()
     except Exception as e:
         logging.error('Lỗi kết nối: ', exec_info = True)
+        print('Error: ' , e)
         
     finally:
         time.sleep(3)
@@ -135,7 +136,7 @@ def lietruyen():
         time.sleep(0.5)
         call(['adb', 'shell', 'input', 'tap', '700', '600'])        # click xuất chiến
         time.sleep(8)
-        for x in range(5):
+        for _ in range(5):
             screencap()
             imgthuquan = imagesearch(   path_Scr + '\\screencap.png',
                                         path_Scr + '\\thuquan.png' ,    0.8)
